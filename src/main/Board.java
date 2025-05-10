@@ -15,11 +15,58 @@ public class Board extends JPanel {
 
     ArrayList<Piece> pieceList = new ArrayList<>(); // Лист фигур
 
+    public Piece selectedPiece; // Выбранная фигура
+
+    Input input = new Input(this);
+
     public Board() {
         this.setPreferredSize(new Dimension(cols * TILESIZE, rows * TILESIZE)); // Размер окна
+
+        this.addMouseListener(input);
+        this.addMouseMotionListener(input);
+
         addPieces(); // Добавление фигур на доску
     }
 
+    // Получение фигуры в определенном столбце и строке
+    public Piece getPiece(int col, int row) {
+       for (Piece piece : pieceList) {
+           if (piece.col == col && piece.row == row) {
+               return piece;
+           }
+       }
+       return null;
+    }
+
+    // Перемещение фигуры
+    public void makeMove(Move move) {
+        move.piece.col = move.newCol;
+        move.piece.row = move.newRow;
+        move.piece.xPos = move.newCol * TILESIZE;
+        move.piece.yPos = move.newRow * TILESIZE;
+
+        capture(move);
+    }
+
+    // Удаление захваченной фигуры из списка
+    public void capture(Move move) {
+        pieceList.remove(move.capture);
+    }
+
+    // Проверка возможности перемещения
+    public boolean isValidMove(Move move) {
+        return !sameTeam(move.piece, move.capture);
+    }
+
+    // Проверка цвета
+    public boolean sameTeam(Piece p1, Piece p2) {
+        if (p1 == null || p2 == null) {
+            return false;
+        }
+        return p1.isWhite == p2.isWhite;
+    }
+
+    // Добавление фигур
     public void addPieces() {
         // Отрисовка черных основных фигур
         pieceList.add(new Rook(this, 0, 0, false));
@@ -67,11 +114,12 @@ public class Board extends JPanel {
         Graphics2D g2d = (Graphics2D) g;
 
         // Окрашивание клеток в цвета
-        for (int r = 0; r < rows; r++)
+        for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
                 g2d.setColor((c + r) % 2 == 0 ? new Color(227, 198, 181) : new Color(157, 105, 53));
                 g2d.fillRect(c * TILESIZE, r * TILESIZE, TILESIZE, TILESIZE);
             }
+        }
 
         // Отрисовка фигур
         for (Piece piece : pieceList) {
