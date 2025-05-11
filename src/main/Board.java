@@ -19,6 +19,8 @@ public class Board extends JPanel {
 
     Input input = new Input(this);
 
+    public int enPassantTile = -1; // Проходная клетка
+
     public Board() {
         this.setPreferredSize(new Dimension(COLS * TILESIZE, ROWS * TILESIZE)); // Размер окна
 
@@ -40,6 +42,42 @@ public class Board extends JPanel {
 
     // Перемещение фигуры
     public void makeMove(Move move) {
+        if (move.piece.name.equals("Pawn")) {
+            movePawn(move);
+        } else {
+            move.piece.col = move.newCol;
+            move.piece.row = move.newRow;
+            move.piece.xPos = move.newCol * TILESIZE;
+            move.piece.yPos = move.newRow * TILESIZE;
+
+            move.piece.isFirstMove = false; // Первый ход прошел
+
+            capture(move.capture);
+        }
+    }
+
+    // Перемещение пешки
+    private void movePawn(Move move) {
+        // Проход пешки
+        int colorIndex = move.piece.isWhite ? 1 : -1;
+
+        if (getTileNum(move.newCol, move.newRow) == enPassantTile) {
+            move.capture = getPiece(move.newCol, move.newRow + colorIndex);
+        }
+
+        if (Math.abs(move.piece.row - move.newRow) == 2) {
+            enPassantTile = getTileNum(move.newCol, move.newRow + colorIndex);
+        } else {
+            enPassantTile = -1;
+        }
+
+        // Превращение пешки
+        colorIndex = move.piece.isWhite ? 0 : 7;
+        if (move.newRow == colorIndex) {
+            promotePawn(move);
+        }
+
+        // Обычное движение пешки
         move.piece.col = move.newCol;
         move.piece.row = move.newRow;
         move.piece.xPos = move.newCol * TILESIZE;
@@ -47,12 +85,18 @@ public class Board extends JPanel {
 
         move.piece.isFirstMove = false; // Первый ход прошел
 
-        capture(move);
+        capture(move.capture);
+    }
+
+    // Превращение пешки
+    private void promotePawn(Move move) {
+        pieceList.add(new Queen(this, move.newCol, move.newRow, move.piece.isWhite));
+        capture(move.piece);
     }
 
     // Удаление захваченной фигуры из списка
-    public void capture(Move move) {
-        pieceList.remove(move.capture);
+    public void capture(Piece piece) {
+        pieceList.remove(piece);
     }
 
     // Проверка возможности перемещения
@@ -81,6 +125,11 @@ public class Board extends JPanel {
             return false;
         }
         return p1.isWhite == p2.isWhite;
+    }
+
+    // Получение номера клетки
+    public int getTileNum(int col, int row) {
+        return row * ROWS + col;
     }
 
     // Добавление фигур

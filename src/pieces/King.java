@@ -21,7 +21,7 @@ public class King extends Piece {
 
     // Проверка возможности перемещения короля
     @Override
-    public boolean isValidMovement (int col, int row) {
+    public boolean isValidMovement(int col, int row) {
         return Math.abs((col - this.col) * (row - this.row)) == 1 || Math.abs(col - this.col) + Math.abs(row - this.row) == 1;
     }
 }
