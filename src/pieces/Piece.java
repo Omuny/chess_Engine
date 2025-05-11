@@ -33,6 +33,16 @@ public class Piece {
         this.board = board;
     }
 
+    // Проверка возможности перемещения
+    public boolean isValidMovement(int col, int row) {
+        return true;
+    }
+
+    // Проверка столкновений фигур
+    public boolean moveCollidesWithPiece(int col, int row) {
+        return false;
+    }
+
     // Отрисовка фигур
     public void paint(Graphics2D g2d) {
         g2d.drawImage(sprite, xPos, yPos,null);

@@ -10,8 +10,8 @@ public class Board extends JPanel {
 
     public static final int TILESIZE = 75; // Размер плитки
 
-    int cols = 8; // столбцы
-    int rows = 8; // строки
+    static final int COLS = 8; // столбцы
+    static final int ROWS = 8; // строки
 
     ArrayList<Piece> pieceList = new ArrayList<>(); // Лист фигур
 
@@ -20,7 +20,7 @@ public class Board extends JPanel {
     Input input = new Input(this);
 
     public Board() {
-        this.setPreferredSize(new Dimension(cols * TILESIZE, rows * TILESIZE)); // Размер окна
+        this.setPreferredSize(new Dimension(COLS * TILESIZE, ROWS * TILESIZE)); // Размер окна
 
         this.addMouseListener(input);
         this.addMouseMotionListener(input);
@@ -55,7 +55,22 @@ public class Board extends JPanel {
 
     // Проверка возможности перемещения
     public boolean isValidMove(Move move) {
-        return !sameTeam(move.piece, move.capture);
+        // Проверка цвета
+        if (sameTeam(move.piece, move.capture)) {
+            return false;
+        }
+
+        // Проверка доступных для перемещения фигуры клеток
+        if (!move.piece.isValidMovement(move.newCol, move.newRow)) {
+            return false;
+        }
+
+        // Проверка столкновений фигур
+        if (move.piece.moveCollidesWithPiece(move.newCol, move.newRow)) {
+            return false;
+        }
+
+        return true;
     }
 
     // Проверка цвета
@@ -113,11 +128,23 @@ public class Board extends JPanel {
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 
-        // Окрашивание клеток в цвета
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
+        // Окрашивание клеток доски в цвета
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
                 g2d.setColor((c + r) % 2 == 0 ? new Color(227, 198, 181) : new Color(157, 105, 53));
                 g2d.fillRect(c * TILESIZE, r * TILESIZE, TILESIZE, TILESIZE);
+            }
+        }
+
+        // Подсветка доступных клеток
+        if (selectedPiece != null) {
+            for (int r = 0; r < ROWS; r++) {
+                for (int c = 0; c < COLS; c++) {
+                    if (isValidMove(new Move(this, selectedPiece, c, r))) {
+                        g2d.setColor(new Color(68, 180, 57, 190));
+                        g2d.fillRect(c * TILESIZE, r * TILESIZE, TILESIZE, TILESIZE);
+                    }
+                }
             }
         }
 

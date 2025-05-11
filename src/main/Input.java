@@ -15,7 +15,6 @@ public class Input extends MouseAdapter {
 
     @Override
     public void mousePressed(MouseEvent e) {
-
         // Получение строки и столбца при нажатии
         int col = e.getX() / board.TILESIZE;
         int row = e.getY() / board.TILESIZE;
@@ -26,9 +25,9 @@ public class Input extends MouseAdapter {
             board.selectedPiece = pieceXY;
         }
     }
+
     @Override
     public void mouseDragged(MouseEvent e) {
-
         // Перемещение фигуры при зажатой фигуре
         if (board.selectedPiece != null) {
             board.selectedPiece.xPos = e.getX() - board.TILESIZE / 2;
@@ -40,7 +39,6 @@ public class Input extends MouseAdapter {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-
         // Получение строки и столбца при отпускании
         int col = e.getX() / board.TILESIZE;
         int row = e.getY() / board.TILESIZE;

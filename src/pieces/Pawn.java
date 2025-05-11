@@ -17,6 +17,5 @@ public class Pawn extends Piece {
 
         // Получение нужного изображения
         this.sprite = sheet.getSubimage(5 * sheetScale, isWhite ? 0 : sheetScale, sheetScale,sheetScale).getScaledInstance(Board.TILESIZE, Board.TILESIZE, BufferedImage.SCALE_SMOOTH);
-
     }
 }

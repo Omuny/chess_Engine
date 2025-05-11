@@ -17,6 +17,11 @@ public class Knight extends Piece {
 
         // Получение нужного изображения
         this.sprite = sheet.getSubimage(3 * sheetScale, isWhite ? 0 : sheetScale, sheetScale,sheetScale).getScaledInstance(Board.TILESIZE, Board.TILESIZE, BufferedImage.SCALE_SMOOTH);
+    }
 
+    // Проверка возможности перемещения коня
+    @Override
+    public boolean isValidMovement (int col, int row) {
+        return Math.abs(col - this.col) * Math.abs(row - this.row) == 2;
     }
 }
