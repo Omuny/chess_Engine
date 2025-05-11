@@ -19,6 +19,8 @@ public class Board extends JPanel {
 
     Input input = new Input(this);
 
+    CheckScanner checkScanner = new CheckScanner(this);
+
     public int enPassantTile = -1; // Проходная клетка
 
     public Board() {
@@ -116,6 +118,11 @@ public class Board extends JPanel {
             return false;
         }
 
+        // Проверка шаха
+        if (checkScanner.isKingChecked(move)) {
+            return false;
+        }
+
         return true;
     }
 
@@ -130,6 +137,16 @@ public class Board extends JPanel {
     // Получение номера клетки
     public int getTileNum(int col, int row) {
         return row * ROWS + col;
+    }
+
+    // Получение короля
+    Piece findKing(boolean isWhite) {
+        for (Piece piece : pieceList) {
+            if (isWhite == piece.isWhite && piece.name.equals("King")) {
+                return piece;
+            }
+        }
+        return null;
     }
 
     // Добавление фигур
