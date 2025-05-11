@@ -10,8 +10,8 @@ public class Knight extends Piece {
         super(board);
         this.col = col;
         this.row = row;
-        this.xPos = col * board.TILESIZE;
-        this.yPos = row * board.TILESIZE;
+        this.xPos = col * Board.TILESIZE;
+        this.yPos = row * Board.TILESIZE;
         this.isWhite = isWhite;
         this.name = "Knight"; // Название фигуры
 

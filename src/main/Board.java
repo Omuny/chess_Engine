@@ -19,7 +19,7 @@ public class Board extends JPanel {
 
     Input input = new Input(this);
 
-    CheckScanner checkScanner = new CheckScanner(this);
+    public CheckScanner checkScanner = new CheckScanner(this);
 
     public int enPassantTile = -1; // Проходная клетка
 
@@ -46,15 +46,32 @@ public class Board extends JPanel {
     public void makeMove(Move move) {
         if (move.piece.name.equals("Pawn")) {
             movePawn(move);
-        } else {
-            move.piece.col = move.newCol;
-            move.piece.row = move.newRow;
-            move.piece.xPos = move.newCol * TILESIZE;
-            move.piece.yPos = move.newRow * TILESIZE;
+        } else if (move.piece.name.equals("King")) {
+            moveKing(move);
+        }
 
-            move.piece.isFirstMove = false; // Первый ход прошел
+        move.piece.col = move.newCol;
+        move.piece.row = move.newRow;
+        move.piece.xPos = move.newCol * TILESIZE;
+        move.piece.yPos = move.newRow * TILESIZE;
 
-            capture(move.capture);
+        move.piece.isFirstMove = false; // Первый ход прошел
+
+        capture(move.capture);
+    }
+
+    // Перемещение короля
+    private void moveKing(Move move) {
+        if (Math.abs(move.piece.col - move.newCol) == 2) {
+            Piece rook;
+            if (move.piece.col < move.newCol) {
+                rook = getPiece(7, move.piece.row);
+                rook.col = 5;
+            } else {
+                rook = getPiece(0, move.piece.row);
+                rook.col = 3;
+            }
+            rook.xPos = rook.col * TILESIZE;
         }
     }
 
@@ -78,16 +95,6 @@ public class Board extends JPanel {
         if (move.newRow == colorIndex) {
             promotePawn(move);
         }
-
-        // Обычное движение пешки
-        move.piece.col = move.newCol;
-        move.piece.row = move.newRow;
-        move.piece.xPos = move.newCol * TILESIZE;
-        move.piece.yPos = move.newRow * TILESIZE;
-
-        move.piece.isFirstMove = false; // Первый ход прошел
-
-        capture(move.capture);
     }
 
     // Превращение пешки
