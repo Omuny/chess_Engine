@@ -18,6 +18,8 @@ public class Piece {
     Image sprite; // Спрайт конкретной фигуры
     Board board;
 
+    public boolean isFirstMove = true; // Проверка первого хода
+
     // Загрузка изображения фигур
     BufferedImage sheet;
     {
