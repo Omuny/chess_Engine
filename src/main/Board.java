@@ -5,6 +5,7 @@ import pieces.*;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Board extends JPanel {
 
@@ -22,6 +23,9 @@ public class Board extends JPanel {
     public CheckScanner checkScanner = new CheckScanner(this);
 
     public int enPassantTile = -1; // Проходная клетка
+
+    private boolean isWhiteMove = true; // Ход белых
+    private boolean isGameOver = false; // Конец игры
 
     public Board() {
         this.setPreferredSize(new Dimension(COLS * TILESIZE, ROWS * TILESIZE)); // Размер окна
@@ -58,6 +62,10 @@ public class Board extends JPanel {
         move.piece.isFirstMove = false; // Первый ход прошел
 
         capture(move.capture);
+
+        isWhiteMove = !isWhiteMove; // Смена хода
+
+        updateGameState(); // Проверка шаха, мата, пата
     }
 
     // Перемещение короля
@@ -110,6 +118,16 @@ public class Board extends JPanel {
 
     // Проверка возможности перемещения
     public boolean isValidMove(Move move) {
+        // Проверка конца игры
+        if (isGameOver) {
+            return false;
+        }
+
+        // Проверка очереди хода
+        if (move.piece.isWhite != isWhiteMove) {
+            return false;
+        }
+
         // Проверка цвета
         if (sameTeam(move.piece, move.capture)) {
             return false;
@@ -199,6 +217,35 @@ public class Board extends JPanel {
         pieceList.add(new Pawn(this, 7, 6, true));
     }
 
+    // Проверка конца игры и шаха
+    private void updateGameState() {
+        Piece king = findKing(isWhiteMove);
+        if (checkScanner.isGameOver(king)) {
+            if (checkScanner.isKingChecked(new Move(this, king, king.col, king.row))) {
+                System.out.println(isWhiteMove ? "Черные выиграли" : "Белые выиграли");
+            } else {
+                System.out.println("Пат");
+            }
+            isGameOver = true;
+        } else if (insuffientMaterial(true) && insuffientMaterial(false)) {
+            System.out.println("Ничья");
+            isGameOver = true;
+        }
+    }
+
+    // Проверка оставшихся фигур на доске
+    private boolean insuffientMaterial(boolean isWhite) {
+        ArrayList<String> names = pieceList.stream()
+                .filter(p -> p.isWhite == isWhite)
+                .map(p -> p.name)
+                .collect(Collectors.toCollection(ArrayList::new));
+        if (names.contains("Queen") || names.contains("Rook") || names.contains("Pawn")) {
+            return false;
+        }
+        return names.size() < 3;
+    }
+
+    // Отрисовка Компонентов
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
