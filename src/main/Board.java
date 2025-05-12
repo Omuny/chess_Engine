@@ -1,0 +1,278 @@
+package main;
+
+import pieces.*;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+
+public class Board extends JPanel {
+
+    public static final int TILESIZE = 75; // Размер плитки
+
+    static final int COLS = 8; // столбцы
+    static final int ROWS = 8; // строки
+
+    ArrayList<Piece> pieceList = new ArrayList<>(); // Лист фигур
+
+    public Piece selectedPiece; // Выбранная фигура
+
+    Input input = new Input(this);
+
+    public CheckScanner checkScanner = new CheckScanner(this);
+
+    public int enPassantTile = -1; // Проходная клетка
+
+    private boolean isWhiteMove = true; // Ход белых
+    private boolean isGameOver = false; // Конец игры
+
+    public Board() {
+        this.setPreferredSize(new Dimension(COLS * TILESIZE, ROWS * TILESIZE)); // Размер окна
+
+        this.addMouseListener(input);
+        this.addMouseMotionListener(input);
+
+        addPieces(); // Добавление фигур на доску
+    }
+
+    // Получение фигуры в определенном столбце и строке
+    public Piece getPiece(int col, int row) {
+       for (Piece piece : pieceList) {
+           if (piece.col == col && piece.row == row) {
+               return piece;
+           }
+       }
+       return null;
+    }
+
+    // Перемещение фигуры
+    public void makeMove(Move move) {
+        if (move.piece.name.equals("Pawn")) {
+            movePawn(move);
+        } else if (move.piece.name.equals("King")) {
+            moveKing(move);
+        }
+
+        move.piece.col = move.newCol;
+        move.piece.row = move.newRow;
+        move.piece.xPos = move.newCol * TILESIZE;
+        move.piece.yPos = move.newRow * TILESIZE;
+
+        move.piece.isFirstMove = false; // Первый ход прошел
+
+        capture(move.capture);
+
+        isWhiteMove = !isWhiteMove; // Смена хода
+
+        updateGameState(); // Проверка шаха, мата, пата
+    }
+
+    // Перемещение короля
+    private void moveKing(Move move) {
+        if (Math.abs(move.piece.col - move.newCol) == 2) {
+            Piece rook;
+            if (move.piece.col < move.newCol) {
+                rook = getPiece(7, move.piece.row);
+                rook.col = 5;
+            } else {
+                rook = getPiece(0, move.piece.row);
+                rook.col = 3;
+            }
+            rook.xPos = rook.col * TILESIZE;
+        }
+    }
+
+    // Перемещение пешки
+    private void movePawn(Move move) {
+        // Проход пешки
+        int colorIndex = move.piece.isWhite ? 1 : -1;
+
+        if (getTileNum(move.newCol, move.newRow) == enPassantTile) {
+            move.capture = getPiece(move.newCol, move.newRow + colorIndex);
+        }
+
+        if (Math.abs(move.piece.row - move.newRow) == 2) {
+            enPassantTile = getTileNum(move.newCol, move.newRow + colorIndex);
+        } else {
+            enPassantTile = -1;
+        }
+
+        // Превращение пешки
+        colorIndex = move.piece.isWhite ? 0 : 7;
+        if (move.newRow == colorIndex) {
+            promotePawn(move);
+        }
+    }
+
+    // Превращение пешки
+    private void promotePawn(Move move) {
+        pieceList.add(new Queen(this, move.newCol, move.newRow, move.piece.isWhite));
+        capture(move.piece);
+    }
+
+    // Удаление захваченной фигуры из списка
+    public void capture(Piece piece) {
+        pieceList.remove(piece);
+    }
+
+    // Проверка возможности перемещения
+    public boolean isValidMove(Move move) {
+        // Проверка конца игры
+        if (isGameOver) {
+            return false;
+        }
+
+        // Проверка очереди хода
+        if (move.piece.isWhite != isWhiteMove) {
+            return false;
+        }
+
+        // Проверка цвета
+        if (sameTeam(move.piece, move.capture)) {
+            return false;
+        }
+
+        // Проверка доступных для перемещения фигуры клеток
+        if (!move.piece.isValidMovement(move.newCol, move.newRow)) {
+            return false;
+        }
+
+        // Проверка столкновений фигур
+        if (move.piece.moveCollidesWithPiece(move.newCol, move.newRow)) {
+            return false;
+        }
+
+        // Проверка шаха
+        if (checkScanner.isKingChecked(move)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // Проверка цвета
+    public boolean sameTeam(Piece p1, Piece p2) {
+        if (p1 == null || p2 == null) {
+            return false;
+        }
+        return p1.isWhite == p2.isWhite;
+    }
+
+    // Получение номера клетки
+    public int getTileNum(int col, int row) {
+        return row * ROWS + col;
+    }
+
+    // Получение короля
+    Piece findKing(boolean isWhite) {
+        for (Piece piece : pieceList) {
+            if (isWhite == piece.isWhite && piece.name.equals("King")) {
+                return piece;
+            }
+        }
+        return null;
+    }
+
+    // Добавление фигур
+    public void addPieces() {
+        // Отрисовка черных основных фигур
+        pieceList.add(new Rook(this, 0, 0, false));
+        pieceList.add(new Knight(this, 1, 0, false));
+        pieceList.add(new Bishop(this, 2, 0, false));
+        pieceList.add(new Queen(this, 3, 0, false));
+        pieceList.add(new King(this, 4, 0, false));
+        pieceList.add(new Bishop(this, 5, 0, false));
+        pieceList.add(new Knight(this, 6, 0, false));
+        pieceList.add(new Rook(this, 7, 0, false));
+
+        // Отрисовка черных пешок
+        pieceList.add(new Pawn(this, 0, 1, false));
+        pieceList.add(new Pawn(this, 1, 1, false));
+        pieceList.add(new Pawn(this, 2, 1, false));
+        pieceList.add(new Pawn(this, 3, 1, false));
+        pieceList.add(new Pawn(this, 4, 1, false));
+        pieceList.add(new Pawn(this, 5, 1, false));
+        pieceList.add(new Pawn(this, 6, 1, false));
+        pieceList.add(new Pawn(this, 7, 1, false));
+
+        // Отрисовка белых основных фигур
+        pieceList.add(new Rook(this, 0, 7, true));
+        pieceList.add(new Knight(this, 1, 7, true));
+        pieceList.add(new Bishop(this, 2, 7, true));
+        pieceList.add(new Queen(this, 3, 7, true));
+        pieceList.add(new King(this, 4, 7, true));
+        pieceList.add(new Bishop(this, 5, 7, true));
+        pieceList.add(new Knight(this, 6, 7, true));
+        pieceList.add(new Rook(this, 7, 7, true));
+
+        // Отрисовка белых пешок
+        pieceList.add(new Pawn(this, 0, 6, true));
+        pieceList.add(new Pawn(this, 1, 6, true));
+        pieceList.add(new Pawn(this, 2, 6, true));
+        pieceList.add(new Pawn(this, 3, 6, true));
+        pieceList.add(new Pawn(this, 4, 6, true));
+        pieceList.add(new Pawn(this, 5, 6, true));
+        pieceList.add(new Pawn(this, 6, 6, true));
+        pieceList.add(new Pawn(this, 7, 6, true));
+    }
+
+    // Проверка конца игры и шаха
+    private void updateGameState() {
+        Piece king = findKing(isWhiteMove);
+        if (checkScanner.isGameOver(king)) {
+            if (checkScanner.isKingChecked(new Move(this, king, king.col, king.row))) {
+                System.out.println(isWhiteMove ? "Черные выиграли" : "Белые выиграли");
+            } else {
+                System.out.println("Пат");
+            }
+            isGameOver = true;
+        } else if (insuffientMaterial(true) && insuffientMaterial(false)) {
+            System.out.println("Ничья");
+            isGameOver = true;
+        }
+    }
+
+    // Проверка оставшихся фигур на доске
+    private boolean insuffientMaterial(boolean isWhite) {
+        ArrayList<String> names = pieceList.stream()
+                .filter(p -> p.isWhite == isWhite)
+                .map(p -> p.name)
+                .collect(Collectors.toCollection(ArrayList::new));
+        if (names.contains("Queen") || names.contains("Rook") || names.contains("Pawn")) {
+            return false;
+        }
+        return names.size() < 3;
+    }
+
+    // Отрисовка Компонентов
+    @Override
+    public void paintComponent(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+
+        // Окрашивание клеток доски в цвета
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
+                g2d.setColor((c + r) % 2 == 0 ? new Color(227, 198, 181) : new Color(157, 105, 53));
+                g2d.fillRect(c * TILESIZE, r * TILESIZE, TILESIZE, TILESIZE);
+            }
+        }
+
+        // Подсветка доступных клеток
+        if (selectedPiece != null) {
+            for (int r = 0; r < ROWS; r++) {
+                for (int c = 0; c < COLS; c++) {
+                    if (isValidMove(new Move(this, selectedPiece, c, r))) {
+                        g2d.setColor(new Color(68, 180, 57, 190));
+                        g2d.fillRect(c * TILESIZE, r * TILESIZE, TILESIZE, TILESIZE);
+                    }
+                }
+            }
+        }
+
+        // Отрисовка фигур
+        for (Piece piece : pieceList) {
+            piece.paint(g2d);
+        }
+    }
+}
