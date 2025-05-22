@@ -30,7 +30,7 @@ public class Pawn extends Piece {
         }
 
         // Первый ход пешки
-        if (isFirstMove && this.col == col && row == this.row - colorIndex * 2 && board.getPiece(col, row) == null && board.getPiece(col, row + colorIndex) == null) {
+        if (this.row == (isWhite ? 6 : 1) && this.col == col && row == this.row - colorIndex * 2 && board.getPiece(col, row) == null && board.getPiece(col, row + colorIndex) == null) {
             return true;
         }
 
