@@ -121,5 +121,7 @@ java -cp out main.Main
 jar cfe Chess.jar main.Main -C out
 ```
 
-<img src="https://github.com/user-attachments/assets/6b4a3203-821e-4736-adbc-7e47e0b346ba" alt="Пример работы приложения 1" align="center" width="400">
-<img src="https://github.com/user-attachments/assets/c68f8735-4b42-43ba-9f45-0f6793f54306" alt="Пример работы приложения 2" align="center" width="400">
+<div align="center"> 
+     <img src="https://github.com/user-attachments/assets/6b4a3203-821e-4736-adbc-7e47e0b346ba" alt="Пример работы приложения 1" width="400">
+     <img src="https://github.com/user-attachments/assets/c68f8735-4b42-43ba-9f45-0f6793f54306" alt="Пример работы приложения 2" width="400">
+</div> 
