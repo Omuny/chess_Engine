@@ -1,6 +1,8 @@
-# Шахматный движок на Java
+# <div align="center">Шахматный движок на Java</div> 
 
-<img src="https://github.com/user-attachments/assets/f6abfaba-1d8b-46ff-bc86-f80c92f6b6f3" alt="Общий вид интерфейса">
+<div align="center">
+     <img src="https://github.com/user-attachments/assets/f6abfaba-1d8b-46ff-bc86-f80c92f6b6f3" alt="Общий вид интерфейса" align="center" width="500">
+</div>
 
 ## 🎮 Особенности
 - Полная реализация правил шахмат
@@ -58,10 +60,11 @@ src/
   - Взятие на проходе. Учет поля enPassantTile
   - Превращение пешки. Автоматическая замена на ферзя
 
-  **Геймплей с подсветкой ходов**:
-    <img src="https://github.com/user-attachments/assets/7eda0586-c26d-4cb5-a778-7b7fa498f1a3" alt="Подсветка ходов">
-  **Пример выполнения рокировки**:
-    <img src="https://github.com/user-attachments/assets/197da630-a58c-4f49-a602-4d319acfaa27" alt="Рокировка короля">
+  **Пример геймплея с подсветкой ходов и выполнения рокировки:**
+  <div align="center"> 
+    <img src="https://github.com/user-attachments/assets/7eda0586-c26d-4cb5-a778-7b7fa498f1a3" alt="Подсветка ходов" width="300">
+    <img src="https://github.com/user-attachments/assets/197da630-a58c-4f49-a602-4d319acfaa27" alt="Рокировка короля" width="300">
+  </div>   
 
 ### 2. Графическая система
 - **Спрайты фигур**. Единый спрайт-лист pieces.png с масштабированием:
@@ -88,10 +91,11 @@ src/
   ```
   FEN-строку можно получить через различные сайты установки начальной позиции. Примером может служить chess.com, по адресу https://www.chess.com/ru/analysis?tab=analysis
 
-  **Стартовая позиция**:
-    <img src="https://github.com/user-attachments/assets/991bf27d-83fd-4255-9c6d-651969aadf5a" alt="Классическая расстановка">
-  **Кастомная позиция**:
-    <img src="https://github.com/user-attachments/assets/f6e8ab38-525f-4333-803c-fe96e833eb85" alt="Тестовая расстановка">
+  **Стартовая позиция и кастомная позиция:**
+  <div align="center">
+    <img src="https://github.com/user-attachments/assets/991bf27d-83fd-4255-9c6d-651969aadf5a" alt="Классическая расстановка"" width="300">
+    <img src="https://github.com/user-attachments/assets/f6e8ab38-525f-4333-803c-fe96e833eb85" alt="Тестовая расстановка" width="300">
+  </div>
 
 - **Проверка конца игры:**
   - Мат. ``checkScanner.isGameOver()``
@@ -117,5 +121,5 @@ java -cp out main.Main
 jar cfe Chess.jar main.Main -C out
 ```
 
-<img src="https://github.com/user-attachments/assets/6b4a3203-821e-4736-adbc-7e47e0b346ba" alt="Пример работы приложения 1">
-<img src="https://github.com/user-attachments/assets/c68f8735-4b42-43ba-9f45-0f6793f54306" alt="Пример работы приложения 2">
+<img src="https://github.com/user-attachments/assets/6b4a3203-821e-4736-adbc-7e47e0b346ba" alt="Пример работы приложения 1" align="center" width="400">
+<img src="https://github.com/user-attachments/assets/c68f8735-4b42-43ba-9f45-0f6793f54306" alt="Пример работы приложения 2" align="center" width="400">
